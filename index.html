@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>BREVIS BLOCKDROP — Accessible Full Version</title>
+<title>ECHO DROP — Accessible Full Version</title>
 <link rel="icon" href="logo.png" />
 <style>
   :root{
@@ -152,7 +152,7 @@
   <div class="top-left-logo">
     <img src="logo.png" alt="Brevis Logo" />
     <div>
-      <h1>BLOCKDROP</h1>
+      <h1>Brevis Blockdrop</h1>
       <!-- subtitle removed as requested -->
     </div>
   </div>
@@ -165,12 +165,13 @@
   <div class="page">
     <!-- left image slot (user will upload left-art.png or change src) -->
     <div class="left-art" id="leftArt">
-      <!-- placeholder text hidden visually; user should replace with an image -->
-      <!-- <img src="left-art.png" alt="Left art (upload your image)"> -->
+      <img id="leftCat" class="left-art-img" src="left.png" alt="Left Art">
     </div>
 
     <div class="stage">
       <canvas id="game" width="10" height="20" aria-label="Brevis Blockdrop game board"></canvas>
+      <!-- visual overlay canvas from script1 -->
+      <canvas id="echoCanvas" width="360" height="720" aria-label="Visual Overlay"></canvas>
       <div class="overlay" id="gameOverOverlay" role="dialog" aria-modal="true" aria-hidden="true">
         <div style="font-size:22px;font-weight:800">GAME OVER</div>
         <div id="finalScoreText" style="font-size:16px"></div>
@@ -193,6 +194,10 @@
           <span class="kbd">Space</span> Hard Drop<br>
           <span class="kbd">Q</span> Rotate Left<br>
         </p>
+        <div style="margin-top:10px;display:flex;gap:8px;justify-content:center;">
+          <button id="startBtn" class="btn">Start</button>
+          <button id="clearBtn" class="btn">Clear</button>
+        </div>
       </div>
       <div class="card" style="text-align:center">
         <div style="font-size:13px;font-weight:700">Audio Accessibility</div>
@@ -202,6 +207,7 @@
       <!-- right image slot inside sidebar (adjacent to control box) -->
       <div class="card" style="display:flex;align-items:center;justify-content:center;">
         <div class="right-art" id="rightArt" style="width:160px;height:120px;">
+          <img id="rightCat" class="right-art-img" src="right.png" alt="Right Art">
           <!-- <img src="right-art.png" alt="Right art (upload)"/> -->
         </div>
       </div>
@@ -565,13 +571,86 @@ function provideHelp(){
 }
 
 // initial announcements
-announce('Welcome to Brevis Blockdrop. Press H for help. Press B to toggle audio mode.');
+announce('Welcome to Echo Drop. Press H for help. Press B to toggle audio mode.');
 
 playerReset();
 update();
 
 // ensure settings saved on unload
 window.addEventListener('beforeunload', saveSettings);
+</script>
+
+<style>
+/* merged visual styles from script1 (kept separate) */
+#echoCanvas {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 360px;
+  height: 720px;
+  pointer-events: none; /* don't block game input */
+  border-radius: 8px;
+  box-shadow: 0 10px 30px rgba(0,255,255,0.04);
+  mix-blend-mode: screen;
+}
+.left-art-img, .right-art-img {
+  max-width:100%;
+  max-height:100%;
+  object-fit:contain;
+  border-radius:8px;
+  opacity:0;
+  transform: translateX(-50px);
+  transition: all 1s ease;
+}
+.left-art-img.show { opacity:1; transform: translateX(0); }
+.right-art-img.show { opacity:1; transform: translateX(0); }
+</style>
+
+<script>
+// merged visual script (non-intrusive)
+// Uses separate canvas id 'echoCanvas' and image ids 'leftCat','rightCat'
+// Functions: startGame(), generateEcho(), clearEcho()
+// Attach to newly added buttons by id
+(function(){
+  const echoCanvas = document.getElementById('echoCanvas');
+  const echoCtx = echoCanvas.getContext('2d');
+  const leftImg = document.getElementById('leftCat');
+  const rightImg = document.getElementById('rightCat');
+  const startBtn = document.getElementById('startBtn');
+  const clearBtn = document.getElementById('clearBtn');
+
+  function randomColor() {
+    const colors = ['#00FFFF', '#FF00FF', '#00FF9D', '#FFD700', '#FF1493', '#7FFF00'];
+    return colors[Math.floor(Math.random() * colors.length)];
+  }
+
+  window.startGame = function() {
+    if (leftImg) leftImg.classList.add('show');
+    if (rightImg) rightImg.classList.add('show');
+    generateEcho();
+  }
+
+  window.generateEcho = function() {
+    if(!echoCtx) return;
+    echoCtx.clearRect(0,0,echoCanvas.width, echoCanvas.height);
+    // draw some colorful blocks (visual only)
+    for (let i = 0; i < 35; i++) {
+      const size = 8 + Math.random() * 25;
+      echoCtx.fillStyle = randomColor();
+      echoCtx.fillRect(Math.random() * echoCanvas.width, Math.random() * echoCanvas.height, size, size);
+    }
+  }
+
+  window.clearEcho = function() {
+    if(!echoCtx) return;
+    echoCtx.clearRect(0,0,echoCanvas.width, echoCanvas.height);
+    if (leftImg) leftImg.classList.remove('show');
+    if (rightImg) rightImg.classList.remove('show');
+  }
+
+  if(startBtn) startBtn.addEventListener('click', startGame);
+  if(clearBtn) clearBtn.addEventListener('click', clearEcho);
+})();
 </script>
 </body>
 </html>
