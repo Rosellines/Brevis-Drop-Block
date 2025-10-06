@@ -3,13 +3,11 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>ECHO DROP — Accessible Full Version</title>
+<title>Brevis Blockdrop</title>
 <link rel="icon" href="logo.png" />
 <style>
   :root{
-    /* Dark cyber base + soft neon accents */
-    --page-bg: #242323;          /* user requested base */
-    --canvas-border-fallback: orange;
+    --page-bg: #242323;
     --accent-cyan: #00ffff;
     --accent-magenta: #ff00ff;
     --soft-panel: rgba(30,30,30,0.9);
@@ -21,14 +19,11 @@
   html,body{
     height:100%;
     margin:0;
-    background: linear-gradient(180deg, #262525 0%, var(--page-bg) 100%);
+    background: linear-gradient(180deg,#262525 0%,var(--page-bg) 100%);
     color:var(--text-light);
-    font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,'Helvetica Neue',Arial;
-    -webkit-font-smoothing:antialiased;
-    -moz-osx-font-smoothing:grayscale;
+    font-family: Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,'Helvetica Neue',Arial;
   }
 
-  /* Top-left logo (changed text) and top-right logo placeholder */
   .top-left-logo{
     position:fixed;
     left:24px;
@@ -39,34 +34,17 @@
     z-index:30;
   }
   .top-left-logo img{
-    height:72px;
+    height:64px;
     width:auto;
     display:block;
-    border-radius:8px;
-    box-shadow:0 6px 22px rgba(0,255,255,0.06);
+    border-radius:0;
+    box-shadow:none;
   }
   .top-left-logo h1{
     margin:0;
     font-size:24px;
-    letter-spacing:0.6px;
     color:var(--accent-cyan);
-    text-shadow:0 0 10px rgba(0,255,255,0.08), 0 0 20px rgba(255,0,255,0.04);
-  }
-
-  .top-right-logo{
-    position:fixed;
-    right:18px;
-    top:18px;
-    z-index:30;
-    display:flex;
-    align-items:center;
-    gap:8px;
-  }
-  .top-right-logo img{
-    height:52px;
-    width:auto;
-    border-radius:8px;
-    box-shadow:0 6px 18px rgba(255,0,255,0.06);
+    text-shadow:0 0 10px rgba(0,255,255,0.4),0 0 20px rgba(255,0,255,0.2);
   }
 
   .page{
@@ -74,49 +52,40 @@
     display:flex;
     align-items:center;
     justify-content:center;
-    padding:40px 120px;
+    padding:40px 80px;
     box-sizing:border-box;
-    gap:24px;
+    gap:40px;
   }
 
-  /* Left & Right art slots for user-uploaded images */
   .left-art, .right-art {
-    width:180px;
-    min-height:360px;
+    width:240px;
+    height:480px;
     display:flex;
     align-items:center;
     justify-content:center;
-    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-    border-radius:10px;
-    border: 1px dashed rgba(255,255,255,0.04);
-    box-shadow: 0 6px 18px rgba(0,0,0,0.35) inset;
   }
   .left-art img, .right-art img {
-    max-width:100%;
-    max-height:100%;
+    width:100%;
+    height:auto;
+    border-radius:12px;
     object-fit:contain;
-    border-radius:8px;
-    box-shadow:0 8px 24px rgba(0,255,255,0.06);
+    filter: drop-shadow(0 0 15px var(--accent-cyan));
   }
 
   .stage{display:flex;align-items:center;justify-content:center;position:relative;gap:12px;}
 
   canvas#game{
-    background: #1b1b1b; /* dark canvas */
+    background:#1b1b1b;
     border-radius:8px;
     width:360px;
     height:720px;
     image-rendering:pixelated;
-    box-shadow:
-      0 10px 30px rgba(0,255,255,0.04),
-      0 18px 40px rgba(255,0,255,0.03);
-    /* neon gradient border (soft) with fallback color */
-    border: 4px solid transparent;
-    border-image-source: linear-gradient(90deg, rgba(0,255,255,0.18), rgba(255,0,255,0.18), rgba(0,255,255,0.18));
-    border-image-slice: 1;
+    box-shadow:0 10px 30px rgba(0,255,255,0.04),0 18px 40px rgba(255,0,255,0.03);
+    border:4px solid transparent;
+    border-image-source:linear-gradient(90deg,rgba(0,255,255,0.18),rgba(255,0,255,0.18),rgba(0,255,255,0.18));
+    border-image-slice:1;
   }
 
-  /* overlay keeps same structure but darker */
   .overlay{position:absolute;inset:0;background:rgba(10,10,10,0.85);display:none;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center;color:var(--text-light);}
   .overlay.show{display:flex;}
 
@@ -127,14 +96,10 @@
   .card{background:var(--card-bg);border-radius:10px;padding:12px;box-shadow:0 6px 20px rgba(0,0,0,0.5);color:var(--text-light);border:1px solid rgba(255,255,255,0.02);}
   .controls h2{margin:0 0 8px 0;font-size:14px;color:var(--accent-cyan);}
   .controls p{margin:0;font-size:13px;line-height:1.6;color:var(--muted);}
-  .controls .kbd{display:inline-block;background:#2b2b2b;padding:4px 8px;border-radius:6px;margin-right:6px;font-size:12px;box-shadow:inset 0 -2px 0 rgba(0,0,0,0.06);color:var(--text-light);}
-
+  .controls .kbd{display:inline-block;background:#2b2b2b;padding:4px 8px;border-radius:6px;margin-right:6px;font-size:12px;color:var(--text-light);}
   .score{font-weight:700;font-size:18px;text-align:center;padding:8px 0;color:var(--accent-cyan);}
-
   footer{position:fixed;right:18px;bottom:18px;font-size:12px;color:var(--accent-magenta);text-shadow:0 0 8px rgba(255,0,255,0.06);}
-
   .visually-hidden{position:absolute!important;height:1px;width:1px;overflow:hidden;clip:rect(1px,1px,1px,1px);white-space:nowrap;border:0;padding:0;margin:-1px}
-
   .access-panel{position:fixed;left:18px;bottom:18px;background:rgba(20,20,20,0.92);padding:10px;border-radius:10px;box-shadow:0 8px 26px rgba(0,0,0,0.5);z-index:30;color:var(--text-light)}
   .access-panel label{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
 
@@ -142,37 +107,23 @@
     .page{padding:20px;flex-direction:column;}
     canvas#game{width:280px;height:560px;}
     .sidebar{width:100%;max-width:360px;}
-    .top-left-logo img{height:56px;}
-    .left-art, .right-art {display:none;}
+    .left-art,.right-art{display:none;}
   }
 </style>
 </head>
 <body>
-  <!-- top-left logo + changed title -->
+
   <div class="top-left-logo">
     <img src="logo.png" alt="Brevis Logo" />
-    <div>
-      <h1>Brevis Blockdrop</h1>
-      <!-- subtitle removed as requested -->
-    </div>
-  </div>
-
-  <!-- top-right logo placeholder (user will update the image) -->
-  <div class="top-right-logo" aria-hidden="true">
-    <img src="top-right-logo.png" alt="Top Right Logo (replace me)" />
+    <h1>Brevis Blockdrop</h1>
   </div>
 
   <div class="page">
-    <!-- left image slot (user will upload left-art.png or change src) -->
-    <div class="left-art" id="leftArt">
-      <img id="leftCat" class="left-art-img" src="left.png" alt="Left Art">
-    </div>
+    <div class="left-art"><img src="left.png" alt="Left Image" /></div>
 
     <div class="stage">
-      <canvas id="game" width="10" height="20" aria-label="Brevis Blockdrop game board"></canvas>
-      <!-- visual overlay canvas from script1 -->
-      <canvas id="echoCanvas" width="360" height="720" aria-label="Visual Overlay"></canvas>
-      <div class="overlay" id="gameOverOverlay" role="dialog" aria-modal="true" aria-hidden="true">
+      <canvas id="game" width="10" height="20"></canvas>
+      <div class="overlay" id="gameOverOverlay">
         <div style="font-size:22px;font-weight:800">GAME OVER</div>
         <div id="finalScoreText" style="font-size:16px"></div>
         <div style="display:flex;gap:10px">
@@ -194,31 +145,18 @@
           <span class="kbd">Space</span> Hard Drop<br>
           <span class="kbd">Q</span> Rotate Left<br>
         </p>
-        <div style="margin-top:10px;display:flex;gap:8px;justify-content:center;">
-          <button id="startBtn" class="btn">Start</button>
-          <button id="clearBtn" class="btn">Clear</button>
-        </div>
       </div>
       <div class="card" style="text-align:center">
         <div style="font-size:13px;font-weight:700">Audio Accessibility</div>
         <div style="font-size:12px;margin-top:6px">Each block type has a unique sound cue. Move, rotate, and drop trigger sound feedback.</div>
       </div>
-
-      <!-- right image slot inside sidebar (adjacent to control box) -->
-      <div class="card" style="display:flex;align-items:center;justify-content:center;">
-        <div class="right-art" id="rightArt" style="width:160px;height:120px;">
-          <img id="rightCat" class="right-art-img" src="right.png" alt="Right Art">
-          <!-- <img src="right-art.png" alt="Right art (upload)"/> -->
-        </div>
-      </div>
+      <div class="right-art"><img src="right.png" alt="Right Image" /></div>
     </aside>
   </div>
 
-  <!-- footer changed as requested -->
   <footer>Brevis Blockdrop</footer>
 
-  <!-- Accessibility panel -->
-  <div class="access-panel" id="accessPanel" aria-hidden="false">
+  <div class="access-panel" id="accessPanel">
     <div style="font-weight:700;margin-bottom:6px">Accessibility</div>
     <label><input type="checkbox" id="audioModeToggle"> Audio Mode (B)</label>
     <label><input type="checkbox" id="voiceGuideToggle" checked> Voice Guide</label>
@@ -226,431 +164,54 @@
     <div style="font-size:12px;margin-top:8px">Shortcuts: <strong>M</strong> menu, <strong>B</strong> audio, <strong>H</strong> help</div>
   </div>
 
-  <!-- Live region for screen readers -->
   <div aria-live="polite" id="srLive" class="visually-hidden"></div>
 
 <script>
-/* === ORIGINAL GAME CORE (kept intact & reused) ===
-   NOTE: **No logic / flow / functions were changed**.
-   Only visual color values below were updated to match the user's requested
-   cyber/dark neon theme (soft glow) and to make block colors multi-colored.
-*/
-
-const canvas = document.getElementById('game');
-const ctx = canvas.getContext('2d');
-const COLS = 10, ROWS = 20;
-ctx.scale(36, 36);
-canvas.width = COLS;
-canvas.height = ROWS;
-
-/* COLORS: replaced with multi-color neon palette (no black).
-   Kept array indexing same so logic using numeric indices stays identical.
-*/
-const colors = [
-  null,
-  '#00FFFF', // cyan
-  '#FF00FF', // magenta
-  '#FF8A00', // orange
-  '#00FF9D', // mint
-  '#FFD700', // gold
-  '#FF1493'  // deep pink
-];
-
-const pieces = 'ILJOTSZ'.split('');
-let board = createMatrix(COLS, ROWS);
-
-let isPaused = false; //global flag added by mohitkerkar05
-
-let dropCounter = 0, dropInterval = 800;
-let lastTime = 0;
-let score = 0;
-const scoreBox = document.getElementById('scoreBox');
-const overlay = document.getElementById('gameOverOverlay');
-const finalScoreText = document.getElementById('finalScoreText');
-
-// === NEW: Audio + Accessibility setup ===
-const audioToggle = document.getElementById('audioModeToggle');
-const voiceToggle = document.getElementById('voiceGuideToggle');
-const vibrateToggle = document.getElementById('vibrateToggle');
-const srLive = document.getElementById('srLive');
-
-// load saved settings
-const settings = JSON.parse(localStorage.getItem('echo_settings')||'{}');
-audioToggle.checked = !!settings.audioMode;
-voiceToggle.checked = settings.voiceGuide!==false; // default true
-vibrateToggle.checked = !!settings.vibrate;
-
-// Web Audio API shared context
-let audioCtx = null;
-function initAudio(){
-  if(audioCtx) return audioCtx;
-  try{ audioCtx = new (window.AudioContext||window.webkitAudioContext)(); }catch(e){ audioCtx = null; }
-  return audioCtx;
-}
-
-function playTone(freq=440,duration=120, pan=0, type='sine', gain=0.08){
-  if(!audioToggle.checked) return;
-  const ctxA = initAudio();
-  if(!ctxA) return;
-  const osc = ctxA.createOscillator();
-  const g = ctxA.createGain();
-  const p = ctxA.createStereoPanner();
-  osc.type = type;
-  osc.frequency.value = freq;
-  g.gain.value = gain;
-  p.pan.value = Math.max(-1, Math.min(1, pan));
-  osc.connect(g).connect(p).connect(ctxA.destination);
-  osc.start();
-  osc.stop(ctxA.currentTime + duration/1000);
-}
-
-function speak(text){
-  if(!voiceToggle.checked) return;
-  if('speechSynthesis' in window){
-    const u = new SpeechSynthesisUtterance(text);
-    u.rate = 1.0;
-    speechSynthesis.cancel();
-    speechSynthesis.speak(u);
-  } else {
-    // fallback: update live region
-    srLive.textContent = text;
-  }
-}
-
-function vib(ms=80){
-  if(!vibrateToggle.checked) return;
-  if(navigator.vibrate) navigator.vibrate(ms);
-}
-
-function announce(msg){
-  srLive.textContent = msg;
-  speak(msg);
-}
-
-function saveSettings(){
-  localStorage.setItem('echo_settings', JSON.stringify({audioMode:audioToggle.checked, voiceGuide:voiceToggle.checked, vibrate:vibrateToggle.checked}));
-}
-
-audioToggle.addEventListener('change', ()=>{ saveSettings(); announce('Audio mode ' + (audioToggle.checked? 'on':'off')); initAudio(); });
-voiceToggle.addEventListener('change', ()=>{ saveSettings(); announce('Voice guide ' + (voiceToggle.checked? 'on':'off')); });
-vibrateToggle.addEventListener('change', ()=>{ saveSettings(); announce('Haptic ' + (vibrateToggle.checked? 'on':'off')); });
-
-// === Original sound function replaced by richer one ===
-function playSound(type){
-  // map to tones and pans based on current piece X position when available
-  const freqMap = {1:440,2:554,3:659,4:784,5:880,6:988,7:1047};
-  const f = freqMap[Math.ceil(Math.random()*7)];
-  playTone(f,120,0, 'sine', 0.08);
-}
-
-// === ORIGINAL GAME FUNCTIONS ===
-function createMatrix(w,h){
-  const m = [];
-  while(h--) m.push(new Array(w).fill(0));
-  return m;
-}
-
-function collide(board, player){
-  const [m,o] = [player.matrix, player.pos];
-  for(let y=0;y<m.length;y++){
-    for(let x=0;x<m[y].length;x++){
-      if(m[y][x]!==0 &&
-        (board[y+o.y] && board[y+o.y][x+o.x])!==0){
-        return true;
-      }
-    }
-  }
-  return false;
-}
-
-function merge(board, player){
-  player.matrix.forEach((row,y)=>{
-    row.forEach((value,x)=>{
-      if(value!==0){
-        board[y+player.pos.y][x+player.pos.x]=value;
-      }
-    });
-  });
-}
-
-function rotate(matrix,dir){
-  for(let y=0;y<matrix.length;y++){
-    for(let x=0;x<y;x++){
-      [matrix[x][y],matrix[y][x]]=[matrix[y][x],matrix[x][y]];
-    }
-  }
-  if(dir>0) matrix.forEach(row=>row.reverse());
-  else matrix.reverse();
-}
-
-function createPiece(type){
-  switch(type){
-    case 'T': return [[0,1,0],[1,1,1],[0,0,0]];
-    case 'O': return [[1,1],[1,1]];
-    case 'L': return [[0,2,0],[0,2,0],[0,2,2]];
-    case 'J': return [[0,3,0],[0,3,0],[3,3,0]];
-    case 'I': return [[0,4,0,0],[0,4,0,0],[0,4,0,0],[0,4,0,0]];
-    case 'S': return [[0,5,5],[5,5,0],[0,0,0]];
-    case 'Z': return [[6,6,0],[0,6,6],[0,0,0]];
-  }
-}
-
-const player = {
-  pos: {x:0,y:0},
-  matrix: null
-};
-
-function playerReset(){
-  const piecesList = 'ILJOTSZ';
-  const type = piecesList[Math.floor(Math.random()*piecesList.length)];
-  player.matrix = createPiece(type);
-  player.pos.y = 0;
-  player.pos.x = (COLS/2 | 0) - (player.matrix[0].length/2 | 0);
-  if(collide(board,player)){
-    board.forEach(row=>row.fill(0));
-    showGameOver();
-  } else {
-    // announce new piece for audio mode
-    if(audioToggle.checked) {
-      // approximate pan from x position
-      const pan = (player.pos.x / (COLS-1)) * 2 -1;
-      playTone(200 + Math.random()*400, 120, pan, 'triangle');
-    }
-    if(voiceToggle.checked) speak('New piece: ' + type);
-  }
-}
-
-function playerDrop(){
-  player.pos.y++;
-  if(collide(board,player)){
-    player.pos.y--;
-    merge(board,player);
-    playSound(2);
-    vib(30);
-    playerReset();
-    sweep();
-  }
-  dropCounter = 0;
-}
-
-function playerMove(dir){
-  player.pos.x += dir;
-  if(collide(board,player)){
-    player.pos.x -= dir;
-  } else {
-    // play spatialized move sound
-    const pan = (player.pos.x / (COLS-1)) * 2 -1;
-    playTone(300 + Math.abs(dir)*50, 60, pan, 'square', 0.06);
-    if(voiceToggle.checked) speak(dir>0? 'Right':'Left');
-  }
-}
-
-function playerRotate(dir){
-  const pos = player.pos.x;
-  let offset = 1;
-  rotate(player.matrix, dir);
-  while(collide(board,player)){
-    player.pos.x += offset;
-    offset = -(offset+(offset>0?1:-1));
-    if(offset>player.matrix[0].length){
-      rotate(player.matrix,-dir);
-      player.pos.x = pos;
-      return;
-    }
-  }
-  playSound(3);
-  if(voiceToggle.checked) speak('Rotate');
-}
-
-function sweep(){
-  outer: for(let y=board.length-1;y>0;y--){
-    for(let x=0;x<board[y].length;x++){
-      if(board[y][x]===0){
-        continue outer;
-      }
-    }
-    const row = board.splice(y,1)[0].fill(0);
-    board.unshift(row);
-    y++;
-    score+=100;
-    scoreBox.textContent = "Score: " + score;
-    // rewarding sound + voice
-    playTone(880, 300, 0, 'sawtooth', 0.12);
-    speak('Line cleared. Score ' + score);
-    vib(120);
-  }
-}
-
-function drawMatrix(matrix, offset){
-  matrix.forEach((row,y)=>{
-    row.forEach((value,x)=>{
-      if(value!==0){
-        ctx.fillStyle = colors[value] || '#00FFFF';
-        ctx.fillRect(x+offset.x,y+offset.y,1,1);
-      }
-    });
-  });
-}
-
-function draw(){
-  /* fill board background with dark tone (visual only) */
-  ctx.fillStyle = '#1b1b1b';
-  ctx.fillRect(0,0,COLS,ROWS);
-  drawMatrix(board,{x:0,y:0});
-  drawMatrix(player.matrix, player.pos);
-}
-
-// original update commented version remained commented to preserve original structure
-
-function update(time = 0) {
-  if (isPaused) return;  // stop updating when paused
-  const delta = time - lastTime;
-  lastTime = time;
-  dropCounter += delta;
-  if (dropCounter > dropInterval) playerDrop();
-  draw();
-  requestAnimationFrame(update);
-}
-
-
-// keyboard handling plus accessibility shortcuts
-let accessPanelVisible = true;
-document.addEventListener('keydown', e=>{
-  if(e.key==='ArrowLeft') playerMove(-1);
-  else if(e.key==='ArrowRight') playerMove(1);
-  else if (e.key === 'p' || e.key === 'P') {
-  isPaused = !isPaused;
-  if (isPaused) {
-    announce('Game paused');
-  } else {
-    announce('Game resumed');
-    requestAnimationFrame(update);
-  }
-} //keyboard feature added 
-
-  else if(e.key==='ArrowDown') playerDrop();
-  else if(e.key==='ArrowUp') playerRotate(1);
-  else if(e.key==='q'||e.key==='Q') playerRotate(-1);
-  else if(e.key===' ') {
-    while(!collide(board,player)) player.pos.y++;
-    player.pos.y--;
-    playerDrop();
-  }
-  else if(e.key==='b' || e.key==='B'){
-    audioToggle.checked = !audioToggle.checked; audioToggle.dispatchEvent(new Event('change'));
-  }
-  else if(e.key==='m' || e.key==='M'){
-    accessPanelVisible = !accessPanelVisible;
-    document.getElementById('accessPanel').style.display = accessPanelVisible? 'block':'none';
-    announce(accessPanelVisible? 'Accessibility menu shown':'Accessibility menu hidden');
-  }
-  else if(e.key==='h' || e.key==='H'){
-    provideHelp();
-  }
-});
-
-function showGameOver(){
-  finalScoreText.textContent = "Final Score: "+score;
-  overlay.classList.add('show');
-  overlay.setAttribute('aria-hidden','false');
-  announce('Game over. Final score ' + score);
-}
-
-document.getElementById('restartBtn').addEventListener('click',()=>{
-  overlay.classList.remove('show');
-  overlay.setAttribute('aria-hidden','true');
-  score = 0;
-  scoreBox.textContent="Score: 0";
-  board = createMatrix(COLS,ROWS);
-  playerReset();
-});
-
-function provideHelp(){
-  const help = 'Controls: arrow left right down up. Space to hard drop. Q rotates left. P for Pause. Press B to toggle audio mode. Press M to toggle accessibility menu. Press H for this help.';
-  announce(help);
-}
-
-// initial announcements
-announce('Welcome to Echo Drop. Press H for help. Press B to toggle audio mode.');
-
-playerReset();
-update();
-
-// ensure settings saved on unload
-window.addEventListener('beforeunload', saveSettings);
-</script>
-
-<style>
-/* merged visual styles from script1 (kept separate) */
-#echoCanvas {
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 360px;
-  height: 720px;
-  pointer-events: none; /* don't block game input */
-  border-radius: 8px;
-  box-shadow: 0 10px 30px rgba(0,255,255,0.04);
-  mix-blend-mode: screen;
-}
-.left-art-img, .right-art-img {
-  max-width:100%;
-  max-height:100%;
-  object-fit:contain;
-  border-radius:8px;
-  opacity:0;
-  transform: translateX(-50px);
-  transition: all 1s ease;
-}
-.left-art-img.show { opacity:1; transform: translateX(0); }
-.right-art-img.show { opacity:1; transform: translateX(0); }
-</style>
-
-<script>
-// merged visual script (non-intrusive)
-// Uses separate canvas id 'echoCanvas' and image ids 'leftCat','rightCat'
-// Functions: startGame(), generateEcho(), clearEcho()
-// Attach to newly added buttons by id
-(function(){
-  const echoCanvas = document.getElementById('echoCanvas');
-  const echoCtx = echoCanvas.getContext('2d');
-  const leftImg = document.getElementById('leftCat');
-  const rightImg = document.getElementById('rightCat');
-  const startBtn = document.getElementById('startBtn');
-  const clearBtn = document.getElementById('clearBtn');
-
-  function randomColor() {
-    const colors = ['#00FFFF', '#FF00FF', '#00FF9D', '#FFD700', '#FF1493', '#7FFF00'];
-    return colors[Math.floor(Math.random() * colors.length)];
-  }
-
-  window.startGame = function() {
-    if (leftImg) leftImg.classList.add('show');
-    if (rightImg) rightImg.classList.add('show');
-    generateEcho();
-  }
-
-  window.generateEcho = function() {
-    if(!echoCtx) return;
-    echoCtx.clearRect(0,0,echoCanvas.width, echoCanvas.height);
-    // draw some colorful blocks (visual only)
-    for (let i = 0; i < 35; i++) {
-      const size = 8 + Math.random() * 25;
-      echoCtx.fillStyle = randomColor();
-      echoCtx.fillRect(Math.random() * echoCanvas.width, Math.random() * echoCanvas.height, size, size);
-    }
-  }
-
-  window.clearEcho = function() {
-    if(!echoCtx) return;
-    echoCtx.clearRect(0,0,echoCanvas.width, echoCanvas.height);
-    if (leftImg) leftImg.classList.remove('show');
-    if (rightImg) rightImg.classList.remove('show');
-  }
-
-  if(startBtn) startBtn.addEventListener('click', startGame);
-  if(clearBtn) clearBtn.addEventListener('click', clearEcho);
-})();
+const canvas=document.getElementById('game');
+const ctx=canvas.getContext('2d');
+const COLS=10,ROWS=20;
+ctx.scale(36,36);
+canvas.width=COLS;canvas.height=ROWS;
+const colors=[null,'#00FFFF','#FF00FF','#FF8A00','#00FF9D','#FFD700','#FF1493'];
+const pieces='ILJOTSZ'.split('');
+let board=createMatrix(COLS,ROWS);
+let isPaused=false,dropCounter=0,dropInterval=800,lastTime=0,score=0;
+const scoreBox=document.getElementById('scoreBox'),overlay=document.getElementById('gameOverOverlay'),finalScoreText=document.getElementById('finalScoreText');
+const audioToggle=document.getElementById('audioModeToggle'),voiceToggle=document.getElementById('voiceGuideToggle'),vibrateToggle=document.getElementById('vibrateToggle'),srLive=document.getElementById('srLive');
+const settings=JSON.parse(localStorage.getItem('echo_settings')||'{}');
+audioToggle.checked=!!settings.audioMode;voiceToggle.checked=settings.voiceGuide!==false;vibrateToggle.checked=!!settings.vibrate;
+let audioCtx=null;
+function initAudio(){if(audioCtx)return audioCtx;try{audioCtx=new(window.AudioContext||window.webkitAudioContext)();}catch(e){audioCtx=null;}return audioCtx;}
+function playTone(f=440,d=120,p=0,t='sine',g=0.08){if(!audioToggle.checked)return;const a=initAudio();if(!a)return;const o=a.createOscillator(),ga=a.createGain(),pa=a.createStereoPanner();o.type=t;o.frequency.value=f;ga.gain.value=g;pa.pan.value=Math.max(-1,Math.min(1,p));o.connect(ga).connect(pa).connect(a.destination);o.start();o.stop(a.currentTime+d/1000);}
+function speak(t){if(!voiceToggle.checked)return;if('speechSynthesis'in window){const u=new SpeechSynthesisUtterance(t);u.rate=1.0;speechSynthesis.cancel();speechSynthesis.speak(u);}else srLive.textContent=t;}
+function vib(m=80){if(!vibrateToggle.checked)return;if(navigator.vibrate)navigator.vibrate(m);}
+function announce(m){srLive.textContent=m;speak(m);}
+function saveSettings(){localStorage.setItem('echo_settings',JSON.stringify({audioMode:audioToggle.checked,voiceGuide:voiceToggle.checked,vibrate:vibrateToggle.checked}));}
+audioToggle.addEventListener('change',()=>{saveSettings();announce('Audio mode '+(audioToggle.checked?'on':'off'));initAudio();});
+voiceToggle.addEventListener('change',()=>{saveSettings();announce('Voice guide '+(voiceToggle.checked?'on':'off'));});
+vibrateToggle.addEventListener('change',()=>{saveSettings();announce('Haptic '+(vibrateToggle.checked?'on':'off'));});
+function playSound(){const f=[440,554,659,784,880,988,1047][Math.ceil(Math.random()*7)-1];playTone(f,120,0,'sine',0.08);}
+function createMatrix(w,h){const m=[];while(h--)m.push(new Array(w).fill(0));return m;}
+function collide(b,p){const[m,o]=[p.matrix,p.pos];for(let y=0;y<m.length;y++)for(let x=0;x<m[y].length;x++)if(m[y][x]!==0&&(b[y+o.y]&&b[y+o.y][x+o.x])!==0)return true;return false;}
+function merge(b,p){p.matrix.forEach((r,y)=>r.forEach((v,x)=>{if(v!==0)b[y+p.pos.y][x+p.pos.x]=v;}));}
+function rotate(m,d){for(let y=0;y<m.length;y++)for(let x=0;x<y;x++) [m[x][y],m[y][x]]=[m[y][x],m[x][y]];if(d>0)m.forEach(r=>r.reverse());else m.reverse();}
+function createPiece(t){switch(t){case'T':return[[0,1,0],[1,1,1],[0,0,0]];case'O':return[[1,1],[1,1]];case'L':return[[0,2,0],[0,2,0],[0,2,2]];case'J':return[[0,3,0],[0,3,0],[3,3,0]];case'I':return[[0,4,0,0],[0,4,0,0],[0,4,0,0],[0,4,0,0]];case'S':return[[0,5,5],[5,5,0],[0,0,0]];case'Z':return[[6,6,0],[0,6,6],[0,0,0]];}}
+const player={pos:{x:0,y:0},matrix:null};
+function playerReset(){const t=pieces[Math.floor(Math.random()*pieces.length)];player.matrix=createPiece(t);player.pos.y=0;player.pos.x=(COLS/2|0)-(player.matrix[0].length/2|0);if(collide(board,player)){board.forEach(r=>r.fill(0));showGameOver();}else{if(audioToggle.checked){const pan=(player.pos.x/(COLS-1))*2-1;playTone(200+Math.random()*400,120,pan,'triangle');}if(voiceToggle.checked)speak('New piece: '+t);}}
+function playerDrop(){player.pos.y++;if(collide(board,player)){player.pos.y--;merge(board,player);playSound();vib(30);playerReset();sweep();}dropCounter=0;}
+function playerMove(d){player.pos.x+=d;if(collide(board,player))player.pos.x-=d;else{const pan=(player.pos.x/(COLS-1))*2-1;playTone(300+Math.abs(d)*50,60,pan,'square',0.06);if(voiceToggle.checked)speak(d>0?'Right':'Left');}}
+function playerRotate(d){const p=player.pos.x;let o=1;rotate(player.matrix,d);while(collide(board,player)){player.pos.x+=o;o=-(o+(o>0?1:-1));if(o>player.matrix[0].length){rotate(player.matrix,-d);player.pos.x=p;return;}}playSound();if(voiceToggle.checked)speak('Rotate');}
+function sweep(){outer:for(let y=board.length-1;y>0;y--){for(let x=0;x<board[y].length;x++){if(board[y][x]===0)continue outer;}const r=board.splice(y,1)[0].fill(0);board.unshift(r);y++;score+=100;scoreBox.textContent="Score: "+score;playTone(880,300,0,'sawtooth',0.12);speak('Line cleared. Score '+score);vib(120);}}
+function drawMatrix(m,o){m.forEach((r,y)=>r.forEach((v,x)=>{if(v!==0){ctx.fillStyle=colors[v]||'#00FFFF';ctx.fillRect(x+o.x,y+o.y,1,1);}}));}
+function draw(){ctx.fillStyle='#1b1b1b';ctx.fillRect(0,0,COLS,ROWS);drawMatrix(board,{x:0,y:0});drawMatrix(player.matrix,player.pos);}
+function update(t=0){if(isPaused)return;const d=t-lastTime;lastTime=t;dropCounter+=d;if(dropCounter>dropInterval)playerDrop();draw();requestAnimationFrame(update);}
+let accessPanelVisible=true;
+document.addEventListener('keydown',e=>{if(e.key==='ArrowLeft')playerMove(-1);else if(e.key==='ArrowRight')playerMove(1);else if(e.key==='p'||e.key==='P'){isPaused=!isPaused;if(isPaused)announce('Game paused');else{announce('Game resumed');requestAnimationFrame(update);}}else if(e.key==='ArrowDown')playerDrop();else if(e.key==='ArrowUp')playerRotate(1);else if(e.key==='q'||e.key==='Q')playerRotate(-1);else if(e.key===' '){while(!collide(board,player))player.pos.y++;player.pos.y--;playerDrop();}else if(e.key==='b'||e.key==='B'){audioToggle.checked=!audioToggle.checked;audioToggle.dispatchEvent(new Event('change'));}else if(e.key==='m'||e.key==='M'){accessPanelVisible=!accessPanelVisible;document.getElementById('accessPanel').style.display=accessPanelVisible?'block':'none';announce(accessPanelVisible?'Accessibility menu shown':'Accessibility menu hidden');}else if(e.key==='h'||e.key==='H')provideHelp();});
+function showGameOver(){finalScoreText.textContent="Final Score: "+score;overlay.classList.add('show');announce('Game over. Final score '+score);}
+document.getElementById('restartBtn').addEventListener('click',()=>{overlay.classList.remove('show');score=0;scoreBox.textContent="Score: 0";board=createMatrix(COLS,ROWS);playerReset();});
+function provideHelp(){announce('Controls: arrow left right down up. Space to hard drop. Q rotates left. P for Pause. Press B for audio. M menu. H help.');}
+announce('Welcome to Brevis Blockdrop. Press H for help. Press B to toggle audio mode.');
+playerReset();update();window.addEventListener('beforeunload',saveSettings);
 </script>
 </body>
 </html>
