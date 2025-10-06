@@ -14,7 +14,7 @@ Because in some cases, they feel lonely in their own world, so this is one way w
 
 I present to you, my friends, Brevis - Blockdrop.
 
-https://soundness-echo-drop.vercel.app/
+https://rosellines.github.io/Brevis-Drop-Block/
 
 
 # Brevis Blockdrop — Accessible Block Drop Game
