@@ -19,7 +19,7 @@ https://soundness-echo-drop.vercel.app/
 
 # Brevis Blockdrop — Accessible Block Drop Game
 
-Echo Drop is a Tetris-style block drop game with enhanced audio and visual accessibility features.
+Brevis blockdrop is a Tetris-style block drop game with enhanced audio and visual accessibility features.
 
 ## Key Features
 
