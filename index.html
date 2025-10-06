@@ -3,575 +3,207 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>ECHO DROP — Accessible Full Version</title>
+<title>ECHO DROP</title>
 <link rel="icon" href="logo.png" />
 <style>
-  :root{
-    /* Dark cyber base + soft neon accents */
-    --page-bg: #242323;          /* user requested base */
-    --canvas-border-fallback: orange;
-    --accent-cyan: #00ffff;
-    --accent-magenta: #ff00ff;
-    --soft-panel: rgba(30,30,30,0.9);
-    --card-bg: rgba(40,40,40,0.82);
+  :root {
+    --bg-dark: #242323;
     --text-light: #eaeaea;
-    --muted: #9a9a9a;
+    --cyan: #00ffff;
+    --magenta: #ff00ff;
   }
 
-  html,body{
-    height:100%;
-    margin:0;
-    background: linear-gradient(180deg, #262525 0%, var(--page-bg) 100%);
-    color:var(--text-light);
-    font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,'Helvetica Neue',Arial;
-    -webkit-font-smoothing:antialiased;
-    -moz-osx-font-smoothing:grayscale;
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: "Share Tech Mono", monospace;
   }
 
-  /* Top-left logo (changed text) and top-right logo placeholder */
-  .top-left-logo{
-    position:fixed;
-    left:24px;
-    top:18px;
-    display:flex;
-    align-items:center;
-    gap:12px;
-    z-index:30;
-  }
-  .top-left-logo img{
-    height:72px;
-    width:auto;
-    display:block;
-    border-radius:8px;
-    box-shadow:0 6px 22px rgba(0,255,255,0.06);
-  }
-  .top-left-logo h1{
-    margin:0;
-    font-size:24px;
-    letter-spacing:0.6px;
-    color:var(--accent-cyan);
-    text-shadow:0 0 10px rgba(0,255,255,0.08), 0 0 20px rgba(255,0,255,0.04);
+  body {
+    background: radial-gradient(circle at center, #2b2b2b 0%, #181818 100%);
+    color: var(--text-light);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    overflow: hidden;
   }
 
-  .top-right-logo{
-    position:fixed;
-    right:18px;
-    top:18px;
-    z-index:30;
-    display:flex;
-    align-items:center;
-    gap:8px;
-  }
-  .top-right-logo img{
-    height:52px;
-    width:auto;
-    border-radius:8px;
-    box-shadow:0 6px 18px rgba(255,0,255,0.06);
+  header {
+    width: 100%;
+    padding: 20px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
   }
 
-  .page{
-    height:100%;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    padding:40px 120px;
-    box-sizing:border-box;
-    gap:24px;
+  header h1 {
+    font-size: 2rem;
+    color: var(--cyan);
+    text-shadow: 0 0 10px var(--cyan), 0 0 25px var(--magenta);
   }
 
-  /* Left & Right art slots for user-uploaded images */
-  .left-art, .right-art {
-    width:180px;
-    min-height:360px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-    border-radius:10px;
-    border: 1px dashed rgba(255,255,255,0.04);
-    box-shadow: 0 6px 18px rgba(0,0,0,0.35) inset;
-  }
-  .left-art img, .right-art img {
-    max-width:100%;
-    max-height:100%;
-    object-fit:contain;
-    border-radius:8px;
-    box-shadow:0 8px 24px rgba(0,255,255,0.06);
+  header img.logo {
+    width: 120px;
+    height: auto;
+    filter: drop-shadow(0 0 12px var(--cyan));
   }
 
-  .stage{display:flex;align-items:center;justify-content:center;position:relative;gap:12px;}
-
-  canvas#game{
-    background: #1b1b1b; /* dark canvas */
-    border-radius:8px;
-    width:360px;
-    height:720px;
-    image-rendering:pixelated;
-    box-shadow:
-      0 10px 30px rgba(0,255,255,0.04),
-      0 18px 40px rgba(255,0,255,0.03);
-    /* neon gradient border (soft) with fallback color */
-    border: 4px solid transparent;
-    border-image-source: linear-gradient(90deg, rgba(0,255,255,0.18), rgba(255,0,255,0.18), rgba(0,255,255,0.18));
-    border-image-slice: 1;
+  main {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 40px;
+    width: 100%;
+    padding: 20px;
+    position: relative;
   }
 
-  /* overlay keeps same structure but darker */
-  .overlay{position:absolute;inset:0;background:rgba(10,10,10,0.85);display:none;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center;color:var(--text-light);}
-  .overlay.show{display:flex;}
+  canvas {
+    background: #1b1b1b;
+    border: 3px solid transparent;
+    border-image: linear-gradient(90deg, var(--cyan), var(--magenta), var(--cyan)) 1;
+    border-radius: 15px;
+    box-shadow: 0 0 15px var(--cyan), 0 0 25px var(--magenta);
+    transition: 0.3s;
+  }
 
-  .btn{padding:6px 12px;border:none;border-radius:6px;background:var(--accent-cyan);cursor:pointer;color:#081010;font-weight:700;box-shadow:0 6px 18px rgba(0,255,255,0.12);}
-  .btn:hover{background:var(--accent-magenta);box-shadow:0 10px 28px rgba(255,0,255,0.12);}
+  .panel {
+    background: rgba(30, 30, 30, 0.95);
+    padding: 20px;
+    border-radius: 15px;
+    border: 2px solid var(--magenta);
+    box-shadow: 0 0 15px var(--magenta), 0 0 20px var(--cyan);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    width: 250px;
+  }
 
-  .sidebar{width:260px;display:flex;flex-direction:column;gap:16px;}
-  .card{background:var(--card-bg);border-radius:10px;padding:12px;box-shadow:0 6px 20px rgba(0,0,0,0.5);color:var(--text-light);border:1px solid rgba(255,255,255,0.02);}
-  .controls h2{margin:0 0 8px 0;font-size:14px;color:var(--accent-cyan);}
-  .controls p{margin:0;font-size:13px;line-height:1.6;color:var(--muted);}
-  .controls .kbd{display:inline-block;background:#2b2b2b;padding:4px 8px;border-radius:6px;margin-right:6px;font-size:12px;box-shadow:inset 0 -2px 0 rgba(0,0,0,0.06);color:var(--text-light);}
+  .panel h2 {
+    font-size: 1.2rem;
+    color: var(--cyan);
+    text-shadow: 0 0 12px var(--cyan);
+  }
 
-  .score{font-weight:700;font-size:18px;text-align:center;padding:8px 0;color:var(--accent-cyan);}
+  button {
+    background: var(--cyan);
+    color: var(--bg-dark);
+    font-weight: bold;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 25px;
+    cursor: pointer;
+    box-shadow: 0 0 10px var(--cyan);
+    transition: 0.3s;
+  }
 
-  footer{position:fixed;right:18px;bottom:18px;font-size:12px;color:var(--accent-magenta);text-shadow:0 0 8px rgba(255,0,255,0.06);}
+  button:hover {
+    background: var(--magenta);
+    box-shadow: 0 0 15px var(--magenta);
+    transform: scale(1.05);
+  }
 
-  .visually-hidden{position:absolute!important;height:1px;width:1px;overflow:hidden;clip:rect(1px,1px,1px,1px);white-space:nowrap;border:0;padding:0;margin:-1px}
+  footer {
+    padding: 15px;
+    color: #888;
+    font-size: 0.9rem;
+    text-shadow: 0 0 10px var(--magenta);
+  }
 
-  .access-panel{position:fixed;left:18px;bottom:18px;background:rgba(20,20,20,0.92);padding:10px;border-radius:10px;box-shadow:0 8px 26px rgba(0,0,0,0.5);z-index:30;color:var(--text-light)}
-  .access-panel label{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
+  /* Animasi kucing */
+  .side-img {
+    position: absolute;
+    width: 150px;
+    opacity: 0;
+    transition: all 1.5s ease;
+    filter: drop-shadow(0 0 15px var(--cyan));
+  }
 
-  @media(max-width:980px){
-    .page{padding:20px;flex-direction:column;}
-    canvas#game{width:280px;height:560px;}
-    .sidebar{width:100%;max-width:360px;}
-    .top-left-logo img{height:56px;}
-    .left-art, .right-art {display:none;}
+  .side-img.left {
+    left: 30px;
+    top: 50%;
+    transform: translateY(-50%) translateX(-100px);
+  }
+
+  .side-img.right {
+    right: 30px;
+    top: 50%;
+    transform: translateY(-50%) translateX(100px);
+  }
+
+  .show-left {
+    opacity: 1;
+    transform: translateY(-50%) translateX(0);
+  }
+
+  .show-right {
+    opacity: 1;
+    transform: translateY(-50%) translateX(0);
   }
 </style>
 </head>
 <body>
-  <!-- top-left logo + changed title -->
-  <div class="top-left-logo">
-    <img src="logo.png" alt="Brevis Logo" />
-    <div>
-      <h1>Brevis Blockdrop</h1>
-      <!-- subtitle removed as requested -->
-    </div>
+
+<header>
+  <h1>ECHO DROP</h1>
+  <img class="logo" src="logo.png" alt="Echo Drop Logo">
+</header>
+
+<main>
+  <!-- Gambar kiri -->
+  <img id="leftCat" class="side-img left" src="left.png" alt="Left Image">
+
+  <canvas id="gameCanvas" width="400" height="300"></canvas>
+
+  <div class="panel">
+    <h2>Control Panel</h2>
+    <button onclick="startGame()">Start</button>
+    <button onclick="clearEcho()">Clear</button>
   </div>
 
-  <!-- top-right logo placeholder (user will update the image) -->
-  <div class="top-right-logo" aria-hidden="true">
-    <img src="top-right-logo.png" alt="Top Right Logo (replace me)" />
-  </div>
+  <!-- Gambar kanan -->
+  <img id="rightCat" class="side-img right" src="right.png" alt="Right Image">
+</main>
 
-  <div class="page">
-    <!-- left image slot (user will upload left-art.png or change src) -->
-    <div class="left-art" id="leftArt">
-      <!-- placeholder text hidden visually; user should replace with an image -->
-      <!-- <img src="left-art.png" alt="Left art (upload your image)"> -->
-    </div>
-
-    <div class="stage">
-      <canvas id="game" width="10" height="20" aria-label="Brevis Blockdrop game board"></canvas>
-      <div class="overlay" id="gameOverOverlay" role="dialog" aria-modal="true" aria-hidden="true">
-        <div style="font-size:22px;font-weight:800">GAME OVER</div>
-        <div id="finalScoreText" style="font-size:16px"></div>
-        <div style="display:flex;gap:10px">
-          <button class="btn" id="restartBtn">Restart</button>
-        </div>
-      </div>
-    </div>
-
-    <aside class="sidebar">
-      <div class="card score" id="scoreBox">Score: 0</div>
-      <div class="card controls">
-        <h2>Controls</h2>
-        <p>
-          <span class="kbd">P</span> Pause<br>
-          <span class="kbd">←</span> Left<br>
-          <span class="kbd">→</span> Right<br>
-          <span class="kbd">↓</span> Soft Drop<br>
-          <span class="kbd">↑</span> Rotate<br>
-          <span class="kbd">Space</span> Hard Drop<br>
-          <span class="kbd">Q</span> Rotate Left<br>
-        </p>
-      </div>
-      <div class="card" style="text-align:center">
-        <div style="font-size:13px;font-weight:700">Audio Accessibility</div>
-        <div style="font-size:12px;margin-top:6px">Each block type has a unique sound cue. Move, rotate, and drop trigger sound feedback.</div>
-      </div>
-
-      <!-- right image slot inside sidebar (adjacent to control box) -->
-      <div class="card" style="display:flex;align-items:center;justify-content:center;">
-        <div class="right-art" id="rightArt" style="width:160px;height:120px;">
-          <!-- <img src="right-art.png" alt="Right art (upload)"/> -->
-        </div>
-      </div>
-    </aside>
-  </div>
-
-  <!-- footer changed as requested -->
-  <footer>Brevis Blockdrop</footer>
-
-  <!-- Accessibility panel -->
-  <div class="access-panel" id="accessPanel" aria-hidden="false">
-    <div style="font-weight:700;margin-bottom:6px">Accessibility</div>
-    <label><input type="checkbox" id="audioModeToggle"> Audio Mode (B)</label>
-    <label><input type="checkbox" id="voiceGuideToggle" checked> Voice Guide</label>
-    <label><input type="checkbox" id="vibrateToggle"> Haptic (vibrate)</label>
-    <div style="font-size:12px;margin-top:8px">Shortcuts: <strong>M</strong> menu, <strong>B</strong> audio, <strong>H</strong> help</div>
-  </div>
-
-  <!-- Live region for screen readers -->
-  <div aria-live="polite" id="srLive" class="visually-hidden"></div>
+<footer>
+  ECHO DROP © 2025
+</footer>
 
 <script>
-/* === ORIGINAL GAME CORE (kept intact & reused) ===
-   NOTE: **No logic / flow / functions were changed**.
-   Only visual color values below were updated to match the user's requested
-   cyber/dark neon theme (soft glow) and to make block colors multi-colored.
-*/
-
-const canvas = document.getElementById('game');
+// ======== ANIMASI DAN VISUAL (DARI SCRIPT 1) ========
+const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
-const COLS = 10, ROWS = 20;
-ctx.scale(36, 36);
-canvas.width = COLS;
-canvas.height = ROWS;
+const leftCat = document.getElementById('leftCat');
+const rightCat = document.getElementById('rightCat');
 
-/* COLORS: replaced with multi-color neon palette (no black).
-   Kept array indexing same so logic using numeric indices stays identical.
-*/
-const colors = [
-  null,
-  '#00FFFF', // cyan
-  '#FF00FF', // magenta
-  '#FF8A00', // orange
-  '#00FF9D', // mint
-  '#FFD700', // gold
-  '#FF1493'  // deep pink
-];
-
-const pieces = 'ILJOTSZ'.split('');
-let board = createMatrix(COLS, ROWS);
-
-let isPaused = false; //global flag added by mohitkerkar05
-
-let dropCounter = 0, dropInterval = 800;
-let lastTime = 0;
-let score = 0;
-const scoreBox = document.getElementById('scoreBox');
-const overlay = document.getElementById('gameOverOverlay');
-const finalScoreText = document.getElementById('finalScoreText');
-
-// === NEW: Audio + Accessibility setup ===
-const audioToggle = document.getElementById('audioModeToggle');
-const voiceToggle = document.getElementById('voiceGuideToggle');
-const vibrateToggle = document.getElementById('vibrateToggle');
-const srLive = document.getElementById('srLive');
-
-// load saved settings
-const settings = JSON.parse(localStorage.getItem('echo_settings')||'{}');
-audioToggle.checked = !!settings.audioMode;
-voiceToggle.checked = settings.voiceGuide!==false; // default true
-vibrateToggle.checked = !!settings.vibrate;
-
-// Web Audio API shared context
-let audioCtx = null;
-function initAudio(){
-  if(audioCtx) return audioCtx;
-  try{ audioCtx = new (window.AudioContext||window.webkitAudioContext)(); }catch(e){ audioCtx = null; }
-  return audioCtx;
+function randomColor() {
+  const colors = ['#00FFFF', '#FF00FF', '#00FF9D', '#FFD700', '#FF1493', '#7FFF00'];
+  return colors[Math.floor(Math.random() * colors.length)];
 }
 
-function playTone(freq=440,duration=120, pan=0, type='sine', gain=0.08){
-  if(!audioToggle.checked) return;
-  const ctxA = initAudio();
-  if(!ctxA) return;
-  const osc = ctxA.createOscillator();
-  const g = ctxA.createGain();
-  const p = ctxA.createStereoPanner();
-  osc.type = type;
-  osc.frequency.value = freq;
-  g.gain.value = gain;
-  p.pan.value = Math.max(-1, Math.min(1, pan));
-  osc.connect(g).connect(p).connect(ctxA.destination);
-  osc.start();
-  osc.stop(ctxA.currentTime + duration/1000);
+function startGame() {
+  leftCat.classList.add('show-left');
+  rightCat.classList.add('show-right');
+  generateEcho();
 }
 
-function speak(text){
-  if(!voiceToggle.checked) return;
-  if('speechSynthesis' in window){
-    const u = new SpeechSynthesisUtterance(text);
-    u.rate = 1.0;
-    speechSynthesis.cancel();
-    speechSynthesis.speak(u);
-  } else {
-    // fallback: update live region
-    srLive.textContent = text;
+function generateEcho() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  for (let i = 0; i < 35; i++) {
+    const size = 8 + Math.random() * 25;
+    ctx.fillStyle = randomColor();
+    ctx.fillRect(Math.random() * canvas.width, Math.random() * canvas.height, size, size);
   }
 }
 
-function vib(ms=80){
-  if(!vibrateToggle.checked) return;
-  if(navigator.vibrate) navigator.vibrate(ms);
+function clearEcho() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
 }
-
-function announce(msg){
-  srLive.textContent = msg;
-  speak(msg);
-}
-
-function saveSettings(){
-  localStorage.setItem('echo_settings', JSON.stringify({audioMode:audioToggle.checked, voiceGuide:voiceToggle.checked, vibrate:vibrateToggle.checked}));
-}
-
-audioToggle.addEventListener('change', ()=>{ saveSettings(); announce('Audio mode ' + (audioToggle.checked? 'on':'off')); initAudio(); });
-voiceToggle.addEventListener('change', ()=>{ saveSettings(); announce('Voice guide ' + (voiceToggle.checked? 'on':'off')); });
-vibrateToggle.addEventListener('change', ()=>{ saveSettings(); announce('Haptic ' + (vibrateToggle.checked? 'on':'off')); });
-
-// === Original sound function replaced by richer one ===
-function playSound(type){
-  // map to tones and pans based on current piece X position when available
-  const freqMap = {1:440,2:554,3:659,4:784,5:880,6:988,7:1047};
-  const f = freqMap[Math.ceil(Math.random()*7)];
-  playTone(f,120,0, 'sine', 0.08);
-}
-
-// === ORIGINAL GAME FUNCTIONS ===
-function createMatrix(w,h){
-  const m = [];
-  while(h--) m.push(new Array(w).fill(0));
-  return m;
-}
-
-function collide(board, player){
-  const [m,o] = [player.matrix, player.pos];
-  for(let y=0;y<m.length;y++){
-    for(let x=0;x<m[y].length;x++){
-      if(m[y][x]!==0 &&
-        (board[y+o.y] && board[y+o.y][x+o.x])!==0){
-        return true;
-      }
-    }
-  }
-  return false;
-}
-
-function merge(board, player){
-  player.matrix.forEach((row,y)=>{
-    row.forEach((value,x)=>{
-      if(value!==0){
-        board[y+player.pos.y][x+player.pos.x]=value;
-      }
-    });
-  });
-}
-
-function rotate(matrix,dir){
-  for(let y=0;y<matrix.length;y++){
-    for(let x=0;x<y;x++){
-      [matrix[x][y],matrix[y][x]]=[matrix[y][x],matrix[x][y]];
-    }
-  }
-  if(dir>0) matrix.forEach(row=>row.reverse());
-  else matrix.reverse();
-}
-
-function createPiece(type){
-  switch(type){
-    case 'T': return [[0,1,0],[1,1,1],[0,0,0]];
-    case 'O': return [[1,1],[1,1]];
-    case 'L': return [[0,2,0],[0,2,0],[0,2,2]];
-    case 'J': return [[0,3,0],[0,3,0],[3,3,0]];
-    case 'I': return [[0,4,0,0],[0,4,0,0],[0,4,0,0],[0,4,0,0]];
-    case 'S': return [[0,5,5],[5,5,0],[0,0,0]];
-    case 'Z': return [[6,6,0],[0,6,6],[0,0,0]];
-  }
-}
-
-const player = {
-  pos: {x:0,y:0},
-  matrix: null
-};
-
-function playerReset(){
-  const piecesList = 'ILJOTSZ';
-  const type = piecesList[Math.floor(Math.random()*piecesList.length)];
-  player.matrix = createPiece(type);
-  player.pos.y = 0;
-  player.pos.x = (COLS/2 | 0) - (player.matrix[0].length/2 | 0);
-  if(collide(board,player)){
-    board.forEach(row=>row.fill(0));
-    showGameOver();
-  } else {
-    // announce new piece for audio mode
-    if(audioToggle.checked) {
-      // approximate pan from x position
-      const pan = (player.pos.x / (COLS-1)) * 2 -1;
-      playTone(200 + Math.random()*400, 120, pan, 'triangle');
-    }
-    if(voiceToggle.checked) speak('New piece: ' + type);
-  }
-}
-
-function playerDrop(){
-  player.pos.y++;
-  if(collide(board,player)){
-    player.pos.y--;
-    merge(board,player);
-    playSound(2);
-    vib(30);
-    playerReset();
-    sweep();
-  }
-  dropCounter = 0;
-}
-
-function playerMove(dir){
-  player.pos.x += dir;
-  if(collide(board,player)){
-    player.pos.x -= dir;
-  } else {
-    // play spatialized move sound
-    const pan = (player.pos.x / (COLS-1)) * 2 -1;
-    playTone(300 + Math.abs(dir)*50, 60, pan, 'square', 0.06);
-    if(voiceToggle.checked) speak(dir>0? 'Right':'Left');
-  }
-}
-
-function playerRotate(dir){
-  const pos = player.pos.x;
-  let offset = 1;
-  rotate(player.matrix, dir);
-  while(collide(board,player)){
-    player.pos.x += offset;
-    offset = -(offset+(offset>0?1:-1));
-    if(offset>player.matrix[0].length){
-      rotate(player.matrix,-dir);
-      player.pos.x = pos;
-      return;
-    }
-  }
-  playSound(3);
-  if(voiceToggle.checked) speak('Rotate');
-}
-
-function sweep(){
-  outer: for(let y=board.length-1;y>0;y--){
-    for(let x=0;x<board[y].length;x++){
-      if(board[y][x]===0){
-        continue outer;
-      }
-    }
-    const row = board.splice(y,1)[0].fill(0);
-    board.unshift(row);
-    y++;
-    score+=100;
-    scoreBox.textContent = "Score: " + score;
-    // rewarding sound + voice
-    playTone(880, 300, 0, 'sawtooth', 0.12);
-    speak('Line cleared. Score ' + score);
-    vib(120);
-  }
-}
-
-function drawMatrix(matrix, offset){
-  matrix.forEach((row,y)=>{
-    row.forEach((value,x)=>{
-      if(value!==0){
-        ctx.fillStyle = colors[value] || '#00FFFF';
-        ctx.fillRect(x+offset.x,y+offset.y,1,1);
-      }
-    });
-  });
-}
-
-function draw(){
-  /* fill board background with dark tone (visual only) */
-  ctx.fillStyle = '#1b1b1b';
-  ctx.fillRect(0,0,COLS,ROWS);
-  drawMatrix(board,{x:0,y:0});
-  drawMatrix(player.matrix, player.pos);
-}
-
-// original update commented version remained commented to preserve original structure
-
-function update(time = 0) {
-  if (isPaused) return;  // stop updating when paused
-  const delta = time - lastTime;
-  lastTime = time;
-  dropCounter += delta;
-  if (dropCounter > dropInterval) playerDrop();
-  draw();
-  requestAnimationFrame(update);
-}
-
-
-// keyboard handling plus accessibility shortcuts
-let accessPanelVisible = true;
-document.addEventListener('keydown', e=>{
-  if(e.key==='ArrowLeft') playerMove(-1);
-  else if(e.key==='ArrowRight') playerMove(1);
-  else if (e.key === 'p' || e.key === 'P') {
-  isPaused = !isPaused;
-  if (isPaused) {
-    announce('Game paused');
-  } else {
-    announce('Game resumed');
-    requestAnimationFrame(update);
-  }
-} //keyboard feature added 
-
-  else if(e.key==='ArrowDown') playerDrop();
-  else if(e.key==='ArrowUp') playerRotate(1);
-  else if(e.key==='q'||e.key==='Q') playerRotate(-1);
-  else if(e.key===' ') {
-    while(!collide(board,player)) player.pos.y++;
-    player.pos.y--;
-    playerDrop();
-  }
-  else if(e.key==='b' || e.key==='B'){
-    audioToggle.checked = !audioToggle.checked; audioToggle.dispatchEvent(new Event('change'));
-  }
-  else if(e.key==='m' || e.key==='M'){
-    accessPanelVisible = !accessPanelVisible;
-    document.getElementById('accessPanel').style.display = accessPanelVisible? 'block':'none';
-    announce(accessPanelVisible? 'Accessibility menu shown':'Accessibility menu hidden');
-  }
-  else if(e.key==='h' || e.key==='H'){
-    provideHelp();
-  }
-});
-
-function showGameOver(){
-  finalScoreText.textContent = "Final Score: "+score;
-  overlay.classList.add('show');
-  overlay.setAttribute('aria-hidden','false');
-  announce('Game over. Final score ' + score);
-}
-
-document.getElementById('restartBtn').addEventListener('click',()=>{
-  overlay.classList.remove('show');
-  overlay.setAttribute('aria-hidden','true');
-  score = 0;
-  scoreBox.textContent="Score: 0";
-  board = createMatrix(COLS,ROWS);
-  playerReset();
-});
-
-function provideHelp(){
-  const help = 'Controls: arrow left right down up. Space to hard drop. Q rotates left. P for Pause. Press B to toggle audio mode. Press M to toggle accessibility menu. Press H for this help.';
-  announce(help);
-}
-
-// initial announcements
-announce('Welcome to Echo Drop. Press H for help. Press B to toggle audio mode.');
-
-playerReset();
-update();
-
-// ensure settings saved on unload
-window.addEventListener('beforeunload', saveSettings);
 </script>
+
 </body>
 </html>
